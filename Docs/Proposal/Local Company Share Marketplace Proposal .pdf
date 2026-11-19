@@ -1,0 +1,75 @@
+# Project Proposal: Local Company Share Marketplace
+
+## 1. Title
+Local Company Share Marketplace
+
+## 2. Problem Statement
+Many growing and small-to-medium enterprises (SMEs) struggle to access direct capital for expansion, while everyday retail investors avoid unregulated, speculative online trading platforms because they feel more like high-risk gambling than genuine business ownership. There is a critical need for a centralized, transparent database system that connects legitimate local companies with everyday investors through verified share offerings and performance tracking.
+
+## 3. Proposed Solution
+An Oracle PL/SQL-backed relational database and marketplace application that registers verified companies, monitors their financial performance (rising vs. falling metrics), and processes transparent share purchases. The database will enforce core business rules, transactional integrity, and comprehensive audit logging automatically.
+
+## 4. Data Source
+* **Source:** Kaggle Open Data (Stock Market Performance & Corporate Financial Metrics Dataset)
+* **Description:** Provides hundreds of structured records containing corporate financial indicators, historical pricing trends, and trading volumes to simulate real-world company valuation and share distribution.
+
+## 5. Planned Tables
+* `COMPANIES`: Stores enterprise details, industry sector, and active status.
+* `INVESTORS`: Stores user registration profiles and contact information.
+* `SHARE_OFFERINGS`: Manages active stock/share blocks available for purchase.
+* `TRANSACTIONS`: Records completed share purchases, quantities, and timestamps.
+* `COMPANY_PERFORMANCE`: Tracks quarterly metrics to classify companies as rising or falling.
+* `AUDIT_LOG`: Records security events and administrative modifications.
+
+## 6. Planned PL/SQL Features
+* **Procedures:** `execute_share_purchase` to safely handle financial transactions and update equity ledgers.
+* **Functions:** `calculate_portfolio_value` to dynamically compute total investor holdings.
+* **Cursors:** To generate automated corporate performance summary reports.
+* **Triggers:** A stock-validation trigger that blocks purchases exceeding available company shares.
+* **Exceptions:** Custom error handlers for insufficient share balances or invalid investor IDs.
+
+## 7. Innovation
+* **Option Chosen:** Analytics Dashboard (Power BI / Tableau)
+* **Description:** A live interactive dashboard connected directly to the Oracle database to visualize market trends, sector investments, and highlight top-performing rising companies.
+
+## 8. References (APA)
+1. World Bank. (2020). *SME Finance in Africa: Firm-Level Evidence on Access to Finance*. World Bank Group.
+2. World Bank Group. (2025). *Boosting SME Finance for Growth*. World Bank Topics.
+3. Rwanda Stock Exchange. (2026). *Market Statistics and SME Market Segment Reports*. RSE.
+4. Puri, P. (2025). *Stock Market Prediction and Financial Metrics Dataset*. Kaggle.
+5. Oracle Corporation. (2026). *Oracle Database PL/SQL Language Reference*. Oracle Documentation.
+```[cite: 7]
+
+---
+
+### Part 2: Phase 1 Business Process Modeling Details
+For **Phase 1**, your instructor requires you to model how work and information flow through your marketplace before designing the database tables[cite: 1, 2]. Here is how you can structure your Phase 1 report (`docs/business_process/business_process_explanation.pdf`) and swimlane diagram (created in **draw.io**, **Lucidchart**, or **Canva**)[cite: 2, 3]:
+
+#### 1. Selected Business Process
+* **Process Name:** *Verified Share Purchase & Investor Allocation Process*
+* **Purpose & Objective:** To allow an investor to browse verified company share offerings, evaluate company performance metrics (rising/falling status), request a share purchase, and have the system validate, execute, and record the transaction securely.
+
+#### 2. Actors & Responsibilities (Swimlanes)
+* **Retail Investor:** Explores available companies, reviews performance data, initiates a share purchase request, and views updated portfolio holdings.
+* **System Marketplace Engine (Automated):** Validates investor account status, checks real-time share availability against company limits, and triggers database constraints.
+* **Company Administrator:** Registers new companies, uploads quarterly financial performance data, and lists share offerings.
+
+#### 3. Step-by-Step Workflow & CRUD Data Activities
+1. **Browse & Consult (Retrieve/Read):** Investor logs in and queries the `COMPANIES` and `SHARE_OFFERINGS` tables to view rising or falling market trends.
+2. **Initiate Purchase:** Investor submits a buy request for a specific number of shares.
+3. **System Validation (Decision Gateway):** 
+   * *Check:* Are there enough shares available in `SHARE_OFFERINGS`? 
+   * *If No:* System rejects the request with an error message.
+   * *If Yes:* Proceed to transaction execution.
+4. **Record Transaction (Create & Update):** 
+   * **Create:** Inserts a new record into the `TRANSACTIONS` table.
+   * **Update:** Updates the remaining share pool in `SHARE_OFFERINGS` and logs the event in `AUDIT_LOG`.
+5. **Confirmation:** Investor receives a successful purchase confirmation and views their updated portfolio.
+
+---
+
+### What to do next:
+1. Save your proposal content into `docs/proposal/proposal.md` (or convert to PDF for submission).
+2. Open **draw.io** (diagrams.net) to build your swimlane diagram with the actors listed above, then publish the link (`File -> Publish -> Link`) to include in your README[cite: 2, 3].
+
+Let me know which of these you are putting together right now so we can make sure it looks pristine for your project records!
