@@ -1,4 +1,3 @@
-
 # Phase II – Normalization & Raw-to-3NF Field Mapping (`UNF` to `3NF`)
 
 ## 1. Unnormalized Form (`UNF`)
@@ -19,7 +18,7 @@ In its raw downloaded structure (`data/raw/fundamentals.csv`), each record combi
 * **Dependency Removed:** Removed the unnamed sequential index artifact (`""`) and wide multi-domain repeating metric groups so every cell holds a single atomic value and each filing row is uniquely identified by the composite natural key `(ticker_symbol, period_ending)`.
 
 ### Sample Rows (`1NF`)
-| `ticker_symbol` (PK) | `period_ending` (PK) | `for_year` | `total_revenue` | `net_income` | `earnings_per_share` | `est_shares_outstanding` | `cash_ratio` |
+| `ticker_symbol` (PK) | `period_ending` (PK) | `for_year` | `revenue` | `net_income` | `earnings_per_share` | `est_shares_outstanding` | `cash_ratio` |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
 | `AAL` | `2012-12-31` | `2012` | `24855000000.00` | `-1876000000.00` | `-5.60` | `335000000` | `53.0` |
 | `AAL` | `2013-12-31` | `2013` | `26743000000.00` | `-1834000000.00` | `-11.25` | `163022222` | `75.0` |
@@ -41,7 +40,7 @@ In its raw downloaded structure (`data/raw/fundamentals.csv`), each record combi
 | `102` | `AAP` | `Advance Auto Parts` | `Consumer Discretionary` | `ACTIVE` |
 
 **Table: `COMPANY_FILINGS_2NF`**
-| `filing_id` (PK) | `company_id` (FK) | `period_ending` | `for_year` | `total_revenue` | `net_income` | `earnings_per_share` | `est_shares_outstanding` | `cash_ratio` |
+| `perf_id` (PK) | `company_id` (FK) | `period_ending` | `for_year` | `revenue` | `net_income` | `earnings_per_share` | `est_shares_outstanding` | `cash_ratio` |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
 | `1` | `101` | `2012-12-31` | `2012` | `24855000000.00` | `-1876000000.00` | `-5.60` | `335000000` | `53.0` |
 | `2` | `101` | `2013-12-31` | `2013` | `26743000000.00` | `-1834000000.00` | `-11.25` | `163022222` | `75.0` |
@@ -52,26 +51,26 @@ In its raw downloaded structure (`data/raw/fundamentals.csv`), each record combi
 ---
 
 ## 4. Third Normal Form (`3NF`)
-* **Dependency Removed:** Removed transitive dependencies where tradable equity offering capacity (`est_shares_outstanding` and derived initial share pricing) belongs to `SHARE_OFFERINGS` rather than annual accounting statements (`COMPANY_PERFORMANCE`), separated `for_year` (transitively determined by `period_ending`), and isolated operational marketplace entities (`INVESTORS`, `TRANSACTIONS`, and `AUDIT_LOG`) so every non-key attribute depends strictly on its own table's primary key.
+* **Dependency Removed:** Removed transitive dependencies where tradable equity offering capacity (`est_shares_outstanding` and derived initial share pricing) belongs to `SHARE_OFFERINGS` rather than periodic accounting statements (`COMPANY_PERFORMANCE`), separated `for_year` (transitively determined by `period_ending`), and isolated operational marketplace entities (`INVESTORS`, `TRANSACTIONS`, and `AUDIT_LOG`) so every non-key attribute depends strictly on its own table's primary key.
 
 ### Final `3NF` Schema (6 Normalized Tables)
 
-1. **`COMPANIES` (`company_id` PK, `ticker_symbol`, `company_name`, `sector`, `status`, `listed_date`)**
-   | `company_id` | `ticker_symbol` | `company_name` | `sector` | `status` | `listed_date` |
+1. **`COMPANIES` (`company_id` PK, `ticker_symbol`, `company_name`, `sector`, `status`, `created_at`)**
+   | `company_id` | `ticker_symbol` | `company_name` | `sector` | `status` | `created_at` |
    | :--- | :--- | :--- | :--- | :--- | :--- |
-   | `101` | `AAL` | `American Airlines Group` | `Industrials` | `ACTIVE` | `2012-12-31` |
-   | `102` | `AAP` | `Advance Auto Parts` | `Consumer Discretionary` | `ACTIVE` | `2012-12-29` |
+   | `101` | `AAL` | `American Airlines Group` | `Industrials` | `ACTIVE` | `2026-11-23 18:00:00` |
+   | `102` | `AAP` | `Advance Auto Parts` | `Consumer Discretionary` | `ACTIVE` | `2026-11-23 18:00:00` |
 
-2. **`COMPANY_PERFORMANCE` (`performance_id` PK, `company_id` FK, `period_ending`, `total_revenue`, `net_income`, `earnings_per_share`, `cash_ratio`, `performance_trend`)**
-   | `performance_id` | `company_id` | `period_ending` | `total_revenue` | `net_income` | `earnings_per_share` | `cash_ratio` | `performance_trend` |
-   | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-   | `1` | `101` | `2012-12-31` | `24855000000.00` | `-1876000000.00` | `-5.60` | `53.0` | `LOSS` |
-   | `2` | `101` | `2013-12-31` | `26743000000.00` | `-1834000000.00` | `-11.25` | `75.0` | `IMPROVING` |
-   | `3` | `101` | `2014-12-31` | `42650000000.00` | `2882000000.00` | `4.02` | `60.0` | `PROFITABLE` |
-   | `4` | `101` | `2015-12-31` | `40990000000.00` | `7610000000.00` | `11.39` | `51.0` | `GROWING` |
-   | `5` | `102` | `2012-12-29` | `6205003000.00` | `387670000.00` | `5.29` | `23.0` | `PROFITABLE` |
+2. **`COMPANY_PERFORMANCE` (`perf_id` PK, `company_id` FK, `period_ending`, `quarter_label`, `revenue`, `net_income`, `earnings_per_share`, `cash_ratio`, `profit_margin`, `trend_status`, `recorded_at`)**
+   | `perf_id` | `company_id` | `period_ending` | `quarter_label` | `revenue` | `net_income` | `earnings_per_share` | `cash_ratio` | `profit_margin` | `trend_status` | `recorded_at` |
+   | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+   | `1` | `101` | `2012-12-31` | `2012-Q4` | `24855000000.00` | `-1876000000.00` | `-5.60` | `53.0` | `-7.55` | `FALLING` | `2026-11-23` |
+   | `2` | `101` | `2013-12-31` | `2013-Q4` | `26743000000.00` | `-1834000000.00` | `-11.25` | `75.0` | `-6.86` | `STABLE` | `2026-11-23` |
+   | `3` | `101` | `2014-12-31` | `2014-Q4` | `42650000000.00` | `2882000000.00` | `4.02` | `60.0` | `6.76` | `RISING` | `2026-11-23` |
+   | `4` | `101` | `2015-12-31` | `2015-Q4` | `40990000000.00` | `7610000000.00` | `11.39` | `51.0` | `18.57` | `RISING` | `2026-11-23` |
+   | `5` | `102` | `2012-12-29` | `2012-Q4` | `6205003000.00` | `387670000.00` | `5.29` | `23.0` | `6.25` | `RISING` | `2026-11-23` |
 
-3. **`SHARE_OFFERINGS` (`offering_id` PK, `company_id` FK, `price_per_share`, `total_shares`, `available_shares`, `offering_date`)**
+3. **`SHARE_OFFERINGS` (`offering_id` PK, `company_id` FK, `price_per_share`, `available_shares`, `total_shares`)**
    *(Populated from `Estimated Shares Outstanding` and valuation metrics per listed company)*
 
 4. **`INVESTORS` (`investor_id` PK, `full_name`, `email`, `wallet_balance`, `created_at`)**
@@ -80,8 +79,8 @@ In its raw downloaded structure (`data/raw/fundamentals.csv`), each record combi
 5. **`TRANSACTIONS` (`transaction_id` PK, `investor_id` FK, `offering_id` FK, `shares_bought`, `total_amount`, `transaction_date`)**
    *(Records validated share purchase executions linking `INVESTORS` to `SHARE_OFFERINGS`)*
 
-6. **`AUDIT_LOG` (`log_id` PK, `table_name`, `action_type`, `details`, `log_timestamp`)**
-   *(Captures automated PL/SQL trigger audit records across marketplace tables)*
+6. **`AUDIT_LOG` (`log_id` PK, `table_name`, `action_type`, `performed_by`, `details`, `log_timestamp`)**
+   *(Captures automated PL/SQL trigger and procedure audit records across marketplace tables)*
 
 ---
 
@@ -91,11 +90,11 @@ In its raw downloaded structure (`data/raw/fundamentals.csv`), each record combi
 | :--- | :--- | :--- | :--- |
 | `""` (Unnamed col 0) | *Dropped* | *N/A* | Dropped redundant CSV row index; replaced by Oracle `IDENTITY` surrogate PKs. |
 | `Ticker Symbol` | `COMPANIES` | `ticker_symbol` | `TRIM()` and `UPPER()`; deduplicate `1,781` filings into unique listed companies (`UNIQUE`). |
-| `Period Ending` | `COMPANY_PERFORMANCE` | `period_ending` | Convert string `YYYY-MM-DD` to Oracle `DATE` via `TO_DATE(period_ending, 'YYYY-MM-DD')`. |
+| `Period Ending` | `COMPANY_PERFORMANCE` | `period_ending`, `quarter_label` | Convert string `YYYY-MM-DD` to Oracle `DATE` via `TO_DATE(period_ending, 'YYYY-MM-DD')` and derive `quarter_label` (`YYYY-Qn`). |
 | `For Year` | *Dropped* | *N/A* | Dropped to eliminate transitive dependency on `Period Ending` (and avoid `173` nulls + `1215.0` typo); year is derived via `EXTRACT(YEAR FROM period_ending)`. |
-| `Total Revenue` | `COMPANY_PERFORMANCE` | `total_revenue` | Parse scientific notation text to `NUMBER(18,2)`. |
-| `Net Income` | `COMPANY_PERFORMANCE` | `net_income` | Parse scientific notation text to `NUMBER(18,2)` (preserving negative values for net losses). |
+| `Total Revenue` | `COMPANY_PERFORMANCE` | `revenue` | Parse scientific notation text to `NUMBER(18,2)`. |
+| `Net Income` | `COMPANY_PERFORMANCE` | `net_income`, `profit_margin` | Parse scientific notation text to `NUMBER(18,2)` (preserving negative values for net losses) and derive `profit_margin = ROUND((net_income / revenue) * 100, 2)`. |
 | `Earnings Per Share` | `COMPANY_PERFORMANCE` | `earnings_per_share` | Parse to `NUMBER(10,2)`; retain `NULL` for the `219` unfiled rows rather than imputing zero. |
 | `Cash Ratio` | `COMPANY_PERFORMANCE` | `cash_ratio` | Parse to `NUMBER(8,2)`; retain `NULL` for the `299` missing liquidity entries. |
-| `Estimated Shares Outstanding` | `SHARE_OFFERINGS` | `total_shares` | Round fractional float (`163022222.2`) to whole shares `NUMBER(15)` (`> 0`); filter out `219` nulls when seeding offerings. |
+| `Estimated Shares Outstanding` | `SHARE_OFFERINGS` | `total_shares`, `available_shares` | Round fractional float (`163022222.2`) to whole shares `NUMBER(15)` (`> 0`); filter out `219` nulls when seeding offerings. |
 | *(Remaining 70 accounting line items)* | *Dropped* | *N/A* | Dropped granular GAAP balance-sheet/cash-flow sub-items (e.g., `Goodwill`, `Deferred Liability Charges`) out of scope for retail share marketplace analytics. |
